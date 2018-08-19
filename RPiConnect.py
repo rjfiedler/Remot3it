@@ -12,7 +12,7 @@ def GetProxy():
         'cache-control': "no-cache"
     }
 
-    response = requests.request("POST", url, data=payload, headers=headers)
+    response = requests.post(url=url, data=payload, headers=headers)
     json_response = response.json()
     token = json_response["token"]
 
@@ -37,10 +37,11 @@ def GetProxy():
     proxyconnectURL = apiMethod + apiServer + apiVersion + "/device/connect"
     connect_params = {'deviceaddress': Ross_Pi_001, "wait": 1, "hostip": myip}
     json_connect_params = json.dumps(connect_params)
-
-    connect_resp = requests.post(proxyconnectURL, headers=deviceHeaders, data=json_connect_params).json()
-    connection = connect_resp["connection"]["proxy"]
-    return connection
+    connection = False
+    while not connection:
+        connect_resp = requests.post(proxyconnectURL, headers=deviceHeaders, data=json_connect_params)
+        connection = connect_resp.json()
+    return connection['connection']['proxy']
 
 
 proxy = GetProxy()
